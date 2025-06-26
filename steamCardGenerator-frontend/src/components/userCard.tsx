@@ -1,4 +1,3 @@
-import React from "react";
 import QRCode from "react-qr-code";
 
 // --- Definiciones de Tipos ---
@@ -9,11 +8,11 @@ type GameInfo = {
 };
 
 type TopGame = GameInfo & {
-  playtime_forever: number; // Tiempo de juego en minutos
+  playtime_forever: number;
 };
 
 type RecentlyPlayedGame = GameInfo & {
-  playtime_2weeks: number; // Tiempo jugado en las últimas 2 semanas en minutos
+  playtime_2weeks: number;
 };
 
 type GamerBusinessCardProps = {
@@ -35,7 +34,6 @@ export default function GamerBusinessCard({
   profileUrl,
   realName,
   country,
-  status,
   gamesOwned = [],
   achievements,
   recentlyPlayed = [],
@@ -61,131 +59,122 @@ export default function GamerBusinessCard({
       return `${remainingMinutes} min`;
     }
   };
+  const totalHoursPlayed = Math.floor(
+    gamesOwned.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+  );
+  const recentHoursPlayed = Math.floor(
+    recentlyPlayed.reduce((acc, game) => acc + game.playtime_2weeks, 0) / 60
+  );
 
   return (
-    <div
-      className="flex flex-col md:flex-row bg-gray-900 text-white rounded-2xl p-6 shadow-2xl overflow-hidden
-                    w-[350px] h-[220px] md:w-[700px] md:h-[280px] relative font-sans
-                    transform transition-all duration-300 hover:scale-[1.02]"
-    >
-      {/* Fondo sutil tipo cuadrícula o patrón gamer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-800 to-gray-700 opacity-90 z-0"></div>
-      <div
-        className="absolute inset-0 bg-[length:15px_15px] [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-10"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, #333 0, #333 1px, transparent 1px, transparent 50%), repeating-linear-gradient(-45deg, #333 0, #333 1px, transparent 1px, transparent 50%)",
-        }}
-      ></div>
-
-      {/* Contenido de la Tarjeta */}
-      <div className="relative z-10 flex flex-col md:flex-row w-full h-full">
-        {/* Anverso / Columna Izquierda: Perfil, Estadísticas y QR */}
-        <div className="flex flex-col items-start justify-between p-4 md:w-1/2 w-full">
-          <div className="flex items-center space-x-3 mb-4">
-            <img
-              src={avatar}
-              alt="Avatar"
-              className="w-16 h-16 rounded-full border-2 border-purple-500 shadow-md"
-            />
-            <div>
-              <h2 className="text-2xl font-extrabold text-purple-400 leading-tight">
-                {username}
-              </h2>
-              {realName && <p className="text-sm text-gray-300">{realName}</p>}
-              {country && <p className="text-xs text-gray-400">🌍 {country}</p>}
+    <div className="bg-gray-950 text-white rounded-2xl p-6 shadow-2xl w-full max-w-4xl mx-auto space-y-6 font-sans relative overflow-hidden">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="flex items-center space-x-4">
+          <img
+            src={avatar}
+            alt="Avatar"
+            className="w-20 h-20 rounded-full border-2 border-purple-500 shadow-lg"
+          />
+          <div>
+            <h2 className="text-3xl font-bold text-purple-400">{username}</h2>
+            {realName && <p className="text-sm text-gray-300">{realName}</p>}
+            {country && <p className="text-xs text-gray-400">🌍 {country}</p>}
+          </div>
+        </div>
+        {profileUrl && (
+          <div className="mt-4 md:mt-0">
+            <div className="bg-white p-2 rounded-xl shadow-inner">
+              <QRCode value={profileUrl} size={80} level="H" />
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Estadísticas y QR en la misma fila */}
-          <div className="flex items-center justify-between w-full mb-4">
-            <div className="text-sm space-y-1">
-              {totalGames > 0 && (
-                <p>
-                  <span className="text-lg mr-1">🎮</span> Juegos:{" "}
-                  <strong>{totalGames}</strong>
-                </p>
-              )}
-              {totalAchievements > 0 && (
-                <p>
-                  <span className="text-lg mr-1">🏆</span> Logros:{" "}
-                  <strong>{totalAchievements}</strong>
-                </p>
-              )}
-            </div>
+      {/* Estadísticas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm">
+        <div className="bg-gray-800 rounded-xl py-4 shadow-inner">
+          <p className="text-purple-300 font-semibold text-lg">🎮</p>
+          <p>Juegos</p>
+          <p className="font-bold text-white">{totalGames}</p>
+        </div>
+        <div className="bg-gray-800 rounded-xl py-4 shadow-inner">
+          <p className="text-purple-300 font-semibold text-lg">🏆</p>
+          <p>Logros</p>
+          <p className="font-bold text-white">{totalAchievements}</p>
+        </div>
+        <div className="bg-gray-800 rounded-xl py-4 shadow-inner">
+          <p className="text-purple-300 font-semibold text-lg">🕹</p>
+          <p>Últimas 2 semanas</p>
+          <p className="font-bold text-white">{recentHoursPlayed} h</p>
+        </div>
 
-            {profileUrl && (
-              <div className="flex flex-col items-center ml-4">
-                {" "}
-                {/* Añadido margen izquierdo */}
-                <div className="p-1 bg-white rounded-lg shadow-inner">
-                  <QRCode value={profileUrl} size={90} level="H" />
+        <div className="bg-gray-800 rounded-xl py-4 shadow-inner">
+          <p className="text-purple-300 font-semibold text-lg">⏱</p>
+          <p>Horas jugadas</p>
+          <p className="font-bold text-white">{totalHoursPlayed} h</p>
+        </div>
+      </div>
+
+      {/* Sección de Juegos */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Top 3 Más Jugados */}
+        {top3Games.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-purple-300 mb-3">
+              🎯 Top 3 Más Jugados
+            </h3>
+            <div className="space-y-3">
+              {top3Games.map((game) => (
+                <div
+                  key={game.appid}
+                  className="flex items-center bg-gray-800 rounded-lg p-3 shadow-md hover:scale-[1.01] transition-transform"
+                >
+                  <img
+                    src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
+                    alt={game.name}
+                    className="w-12 h-12 rounded shadow"
+                  />
+                  <div className="ml-3">
+                    <p className="text-sm font-medium">{game.name}</p>
+                    <p className="text-xs text-gray-400">
+                      ⏱ {formatPlaytime(game.playtime_forever)}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">Escanéame</p>{" "}
-                {/* Texto más corto */}
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Reverso / Columna Derecha: Juegos Destacados */}
-        <div className="flex flex-col p-4 md:w-1/2 w-full md:border-l border-gray-700 space-y-4">
-          {top3Games.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-purple-300 mb-2">
-                🎯 Top 3 Más Jugados
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {top3Games.map((game) => (
-                  <div
-                    key={game.appid}
-                    className="flex items-center space-x-3 bg-gray-800 rounded-lg p-2 transition-transform hover:scale-[1.02]"
-                  >
-                    <img
-                      src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
-                      alt={game.name}
-                      className="w-10 h-10 rounded shadow"
-                    />
-                    <div>
-                      <p className="font-medium text-sm">{game.name}</p>
-                      <p className="text-xs text-gray-400">
-                        ⏱ {formatPlaytime(game.playtime_forever)}
-                      </p>
-                    </div>
+        {/* Jugado Recientemente */}
+        {recentlyPlayed.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-purple-300 mb-3">
+              🕒 Jugado Recientemente
+            </h3>
+            <div className="space-y-3">
+              {recentlyPlayed.slice(0, 3).map((game) => (
+                <div
+                  key={game.appid}
+                  className="flex items-center bg-gray-800 rounded-lg p-3 shadow-md hover:scale-[1.01] transition-transform"
+                >
+                  <img
+                    src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
+                    alt={game.name}
+                    className="w-12 h-12 rounded shadow"
+                  />
+                  <div className="ml-3">
+                    <p className="text-sm font-medium">{game.name}</p>
+                    <p className="text-xs text-gray-400">
+                      ⏱ {formatPlaytime(game.playtime_2weeks)}
+                    </p>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
-
-          {recentlyPlayed.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-purple-300 mt-4 mb-2">
-                ⚡ Jugado Recientemente
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {recentlyPlayed.slice(0, 3).map((game) => (
-                  <div
-                    key={game.appid}
-                    className="flex items-center space-x-3 bg-gray-800 rounded-lg p-2 transition-transform hover:scale-[1.02]"
-                  >
-                    <img
-                      src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
-                      alt={game.name}
-                      className="w-10 h-10 rounded shadow"
-                    />
-                    <div>
-                      <p className="font-medium text-sm">{game.name}</p>
-                      <p className="text-xs text-gray-400">
-                        ⏱ {formatPlaytime(game.playtime_2weeks)} (últ. 2 sem.)
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
